@@ -19,12 +19,15 @@ class Block{
     }
 
     calculateHash(){
-        return SHA256(this.index + this.previusHash + this.timestamp + this.nonce + JSON.stringify(this.data)).toString();
+        return SHA256(this.previusHash + this.timestamp + this.nonce + JSON.stringify(this.transaction)).toString();
         //toString jer SHA256 vraca objekat
     }
 
     mineBlock(dificulty){
+        //proverava da li ima dovoljno nula u hashu, implementacija proof of work sistema
         while(this.hash.substring(0,dificulty) !== Array(dificulty + 1).join("0")){
+
+            //inkrementiramo nonce da bismo u svakoj iteraciji dobijali drugaciji hash
             this.nonce++;
             this.hash=this.calculateHash();
         }
@@ -36,11 +39,11 @@ class Block{
 class Blockchain{
     constructor(){
         this.chain=[this.createGenesisBlock()];
-        this.dificulty=2;
+        this.dificulty=4;
         this.pendingTransactions=[];
         this.miningReward=100;
     }
-
+    //pravljenje pocetnog bloka
     createGenesisBlock(){
         return new Block("03/06/2018","Genesis block","0");
     }
@@ -103,28 +106,44 @@ class Blockchain{
 
 }
 
+//TESTIRANJE
 let nemanjaCoin=new Blockchain();
 
-nemanjaCoin.createTransaction(new Transaction("adresa1","adresa2",20));
-nemanjaCoin.createTransaction(new Transaction("adresa2","adresa3",14));
-nemanjaCoin.createTransaction(new Transaction("adresa1","adresa2",31));
-nemanjaCoin.createTransaction(new Transaction("adresa2","adresa1",45));
+const adresa1="LAT4R23Q";
+const adresa2="77BBJKGD";
+const adresa3="XD8RJNAN";
+const adresa4="4CX8VNSC";
 
-console.log("Zapocinje se kopanje...");
-nemanjaCoin.minePendingTransactions("Satosi");
+nemanjaCoin.createTransaction(new Transaction(adresa1,adresa2,20));
+nemanjaCoin.createTransaction(new Transaction(adresa2,adresa3,14));
+nemanjaCoin.createTransaction(new Transaction(adresa4,adresa1,31));
+nemanjaCoin.createTransaction(new Transaction(adresa2,adresa3,45));
 
-nemanjaCoin.createTransaction(new Transaction("adresa1","adresa2",32));
-nemanjaCoin.createTransaction(new Transaction("adresa2","adresa1",78));
+console.log("Zapocinje se kopanje 1...");
+nemanjaCoin.minePendingTransactions(adresa2);
 
-console.log("Stanje Satosijevih koina je: ",nemanjaCoin.getBalanceAddress("Satosi"));
+nemanjaCoin.createTransaction(new Transaction(adresa4,adresa3,32));
+nemanjaCoin.createTransaction(new Transaction(adresa3,adresa2,76));
+nemanjaCoin.createTransaction(new Transaction(adresa4,adresa1,45));
+nemanjaCoin.createTransaction(new Transaction(adresa1,adresa4,49));
+nemanjaCoin.createTransaction(new Transaction(adresa1,adresa3,23));
+nemanjaCoin.createTransaction(new Transaction(adresa2,adresa2,78));
+
+console.log("Stanje adrese 1 je: ",nemanjaCoin.getBalanceAddress(adresa1));
+console.log("Stanje adrese 2 je: ",nemanjaCoin.getBalanceAddress(adresa2));
+console.log("Da li je lanac validan: " + nemanjaCoin.isChainValid()?"jeste":"nije");
 
 console.log("Zapocinje se kopanje 2...");
-nemanjaCoin.minePendingTransactions("Satosi");
+nemanjaCoin.minePendingTransactions(adresa1);
 
-console.log("Stanje Satosijevih koina je: "+ nemanjaCoin.getBalanceAddress("Satosi"));
+console.log("Stanje adrese 1 je: ",nemanjaCoin.getBalanceAddress(adresa1));
+console.log("Stanje adrese 2 je: ",nemanjaCoin.getBalanceAddress(adresa2));
 
-console.log("Zapocinje se kopanje 2...");
-nemanjaCoin.minePendingTransactions("Satosi");
+console.log("Zapocinje se kopanje 3...");
+nemanjaCoin.minePendingTransactions(adresa3);
+nemanjaCoin.createTransaction(new Transaction(adresa1,adresa4,49));
 
-console.log("Stanje Satosijevih koina je: "+ nemanjaCoin.getBalanceAddress("Satosi"));
-console.log("Stanje koina adrese 1 je: "+ nemanjaCoin.getBalanceAddress("adresa1"));
+console.log("Stanje adrese 1 je: ",nemanjaCoin.getBalanceAddress(adresa1));
+console.log("Stanje adrese 2 je: ",nemanjaCoin.getBalanceAddress(adresa2));
+
+
