@@ -3,6 +3,10 @@ Simple concept of cryptocurency blockchain written in <b>JavaScript</b> (ES6)
 
 * [crypto-js](https://www.npmjs.com/package/crypto-js) - Javascript library used for SHA-256 hash algorithm
 
+* Implemented proof of work system 
+
+* Implemented function for checking is the blockchain valid
+
 * No user interface for now
 
 
